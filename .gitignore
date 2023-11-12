@@ -3,3 +3,8 @@
 .idea/
 
 db.sqlite3
+
+.venv
+.vscode
+dist
+box_picture

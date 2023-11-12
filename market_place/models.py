@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from djmoney.forms import MoneyField
+from django.db.models import Q, F
 
 from market_place.constants import StorageTypes
 
@@ -36,3 +37,17 @@ class StorageBox(models.Model):
     image_1 = models.ImageField(upload_to="box_picture")
     image_2 = models.ImageField(upload_to="box_picture")
     image_3 = models.ImageField(upload_to="box_picture")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    availability_start_date = models.DateField("Date de début de disponibilité", null=True) 
+    availability_end_date = models.DateField("Date de fin de disponibilité", null=True) 
+
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                check=Q(availability_end_date__gte=F('availability_start_date')),
+                name="availability_constraint"
+            )
+        ]
+
