@@ -6,7 +6,7 @@ from django.db.models import Q
 import datetime
 
 class StorageBoxAdmin(admin.ModelAdmin):
-    list_display = ["id","created_at","get_owner_email","title","surface", "availability_start_date", "availability_end_date"]
+    list_display = ["id","created_at","get_owner_email","title","surface", "availability_start_date", "availability_end_date", "monthly_price"]
     list_filter = [("surface", NumericRangeFilterBuilder()),]
     ordering = ["-created_at"] 
 

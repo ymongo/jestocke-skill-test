@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from djmoney.forms import MoneyField
+from djmoney.models.fields import MoneyField
 from django.db.models import Q, F
 
 from market_place.constants import StorageTypes
@@ -20,13 +20,13 @@ class StorageBox(models.Model):
     id = models.AutoField(primary_key=True)
     owner = models.ForeignKey(Profile, verbose_name="owner", on_delete=models.CASCADE)
 
-    storage_type = models.CharField(_("Type d'espace"), max_length=32, choices=StorageTypes.choices)
+    storage_type = models.CharField(_("Storage type"), max_length=32, choices=StorageTypes.choices)
 
     title = models.CharField(verbose_name=_("Ad title"), max_length=512)
     slug = models.SlugField(max_length=128, editable=False, null=True, unique=True)
     description = models.TextField(_("Description"), blank=True, null=True, default="")
     surface = models.IntegerField(_("Surface (m²)"), blank=True, null=True, default=1)
-    monthly_price = MoneyField(max_digits=14, decimal_places=2, default_currency='EUR')
+    monthly_price = MoneyField(max_digits=14, decimal_places=2, default=0,default_currency='EUR')
 
     street_number = models.CharField("N°", blank=True, null=True, max_length=128)
     route = models.CharField("route", blank=True, null=True, max_length=512)
@@ -39,10 +39,13 @@ class StorageBox(models.Model):
     image_3 = models.ImageField(upload_to="box_picture")
     
     created_at = models.DateTimeField(auto_now_add=True)
-    availability_start_date = models.DateField("Date de début de disponibilité", null=True) 
-    availability_end_date = models.DateField("Date de fin de disponibilité", null=True) 
-
-
+    availability_start_date = models.DateField("Availability start date", null=True) 
+    availability_end_date = models.DateField("Availability end date", null=True) 
+    
+    @property
+    def num_route_concat(self):
+        return f"{self.street_number or ''} {self.route or ''} {self.additional_address or ''}"
+    
     class Meta:
         constraints = [
             models.CheckConstraint(
